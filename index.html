@@ -31,8 +31,11 @@ svg{display:block;flex:none}
 .av{width:40px;flex:none;display:flex;align-items:center;justify-content:center;border-right:3px solid var(--k);color:var(--w);font:700 17px Fredoka,Arial,sans-serif}
 .av span{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}
 .rows{flex:1;display:flex;flex-direction:column;min-width:0}
-.row{flex:1;display:flex;align-items:center;gap:8px;padding:2px 8px 2px 6px;border-bottom:2px dashed var(--k);min-height:0}
+.row{flex:1;display:flex;align-items:center;gap:8px;padding:2px 0 2px 6px;border-bottom:2px dashed var(--k);min-height:0}
 .row:last-child{border-bottom:0}
+.tm{width:62px;flex:none;align-self:stretch;margin:-2px 0;border-left:2px dotted currentColor;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;text-align:center}
+.tm b{font:600 15px/1 Fredoka,Arial,sans-serif;letter-spacing:-.2px;white-space:nowrap}
+.tm small{font:900 9px/1 Nunito,Arial,sans-serif;letter-spacing:.8px;text-transform:uppercase}
 .tx{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
 .lab{font:900 9.5px/1 Nunito,Arial,sans-serif;letter-spacing:.6px;text-transform:uppercase}
 .val{font:800 14.5px/1.08 Nunito,Arial,sans-serif;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -137,6 +140,30 @@ const FOOD=[[/schnitzel|cutlet|chicken|nugget/i,"schnitzel"],[/grill|bbq|barbecu
 const pick=(list,t,def)=>{for(const [re,n] of list) if(re.test(t)) return n; return def};
 const firstWord=v=>{const w=v.replace(/^[\d:.\s-]+(am|pm)?\s*/i,"").split(/[.,(\n]/)[0].trim().split(/\s+/);return w.slice(0,w[0]&&w[0].length<4?2:1).join(" ")};
 
+/* ---------- times go in their own column on the right ---------- */
+// Pull the first time out of a cell's text: returns {text, time, ampm}
+function splitTime(raw){
+  const T="(\\d{1,2}(?::\\d{2})?)", AP="\\s*(a\\.?m\\.?|p\\.?m\\.?)?";
+  const re=new RegExp(`(?:@\\s*)?(?:${T}${AP}\\s*(?:-|–|to)\\s*${T}${AP}|(\\d{1,2}:\\d{2})${AP}(ish)?|(\\d{1,2})\\s*(a\\.?m\\.?|p\\.?m\\.?)(ish)?)`,"i");
+  const m=raw.match(re); if(!m) return {text:raw,time:"",ampm:""};
+  const norm=t=>t.replace(/:00$/,"");
+  const ap=a=>a?a.replace(/\./g,"").toLowerCase():"";
+  let time,ampm;
+  if(m[1]){ if(!/:/.test(m[1]+m[3])&&!m[2]&&!m[4]) return {text:raw,time:"",ampm:""};
+    time=norm(m[1])+"–"+norm(m[3]); ampm=ap(m[4]||m[2]); }
+  else if(m[5]){ time=(m[7]?"~":"")+norm(m[5]); ampm=ap(m[6]); }
+  else { time=(m[10]?"~":"")+m[8]; ampm=ap(m[9]); }
+  let t=raw.slice(0,m.index)+" \u0000 "+raw.slice(m.index+m[0].length);
+  t=t.replace(/\(\s*\u0000\s*\)/g," · ")          // "(6 pm)" -> ·
+     .replace(/\s*\u0000\s*/g," ")
+     .replace(/\(\s*\)/g,"").replace(/\s+/g," ")
+     .replace(/·\s*[-–:]\s*/g,"· ").replace(/\s[-–:]\s*\(/g," (").replace(/\s[-–]\s*$/,"")
+     .replace(/^\s*[·\-–:,@]+\s*/,"").replace(/\s*[·\-–:,@]+\s*$/,"").trim();
+  const u=t.match(/^\((.*)\)(.*)$/); if(u) t=(u[1]+u[2]).trim();
+  t=t.replace(/\s*·\s*$/,"").replace(/\s+\)/g,")").replace(/\(\s+/g,"(").replace(/\s+/g," ");
+  return {text:t,time,ampm};
+}
+
 /* ---------- read the Google Sheet (values + cell colors + hidden rows/cols) ---------- */
 function hex2rgb(h){h=(h||"").replace(/^#|^FF(?=[0-9A-F]{6}$)/i,"");if(h.length!==6)return null;return [0,2,4].map(i=>parseInt(h.substr(i,2),16))}
 function hs(c){const [r,g,b]=c.map(x=>x/255),mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let h=0;
@@ -240,15 +267,21 @@ function render(D){
   const kids=[...new Set(D.rows.map(r=>r.kid))];
   const kc=k=>C[KID_COLORS[kids.indexOf(k)%KID_COLORS.length]];
 
+  // Only show rows that have something in them today (skip blank, "—", and blacked-out cells)
+  const blank=v=>empty(v.t)||(v.bg&&v.bg.every(x=>x<40));
+  const used=new Set();
   const kidHTML=kids.map(k=>{
-    const rs=D.rows.filter(r=>r.kid===k);
-    return `<div class="kid" style="flex:${rs.length+(rs.length===1?.5:0)}"><div class="av" style="background:${kc(k)}"><span>${esc(k)}</span></div><div class="rows">`+
+    const rs=D.rows.filter(r=>r.kid===k&&!blank(r.vals[f]));
+    const n=Math.max(rs.length,1);
+    const free=`<div class="row">${icon("sun",28)}<div class="tx"><span class="val none">Nothing scheduled</span></div></div>`;
+    return `<div class="kid" style="flex:${n+(n===1?.5:0)}"><div class="av" style="background:${kc(k)}"><span>${esc(k)}</span></div><div class="rows">`+(rs.length?"":free)+
       rs.map(r=>{
-        const v=r.vals[f], w=who(v,D), off=/no school/i.test(v.t), na=w&&w.na, none=empty(v.t)||na;
+        const v=r.vals[f], w=who(v,D); if(w&&w.name&&!/^bus$/i.test(w.name)) used.add(w.name); const off=/no school/i.test(v.t), na=w&&w.na, none=empty(v.t)||na;
+        const st=splitTime(v.t);
         const fl=!off&&((w&&w.flag)||/\?|needs/i.test(v.t));
         const kind=/after|activ/i.test(r.item)?"after":/school/i.test(r.item)?"school":/home|back|pick/i.test(r.item)?"home":"after";
         const ic=off?"sun":none?"none":kind==="after"?pick(ACT,v.t,"star"):kind;
-        return `<div class="row ${off?"off":""} ${fl?"flag":""}">${off?S(ICON.sun,28,W):icon(ic,28)}<div class="tx"><span class="lab">${esc(r.item)}</span><span class="val ${none?"none":""}">${none?"—":esc(v.t)}</span></div>${off||none?"":fl&&!(w&&w.name)?`<span class="badge" style="background:${W}">?</span>`:badge(w)}</div>`;
+        return `<div class="row ${off?"off":""} ${fl?"flag":""}">${off?S(ICON.sun,28,W):icon(ic,28)}<div class="tx"><span class="lab">${esc(r.item)}</span><span class="val ${none?"none":""}">${none?"—":esc(st.text)}</span></div>${off||none?"":fl&&!(w&&w.name)?`<span class="badge" style="background:${W}">?</span>`:badge(w)}<div class="tm">${st.time?`<b>${esc(st.time)}</b>${st.ampm?`<small>${st.ampm}</small>`:""}`:""}</div></div>`;
       }).join("")+`</div></div>`;
   }).join("");
 
@@ -269,14 +302,15 @@ function render(D){
 
   const seen=new Set();
   const legend=D.legend.map(L=>{const p=Object.keys(PEOPLE).find(n=>new RegExp("\\b"+n+"\\b","i").test(L.name));return p}).filter(p=>p&&!seen.has(p)&&seen.add(p));
-  const lgHTML=(legend.length?legend:Object.keys(PEOPLE)).map(p=>`<span class="lg">${badge({name:p,color:PEOPLE[p]},18)}${esc(p)}</span>`).join("");
+  // legend: only the drivers who appear on today's plan
+  const lgHTML=(legend.length?legend:Object.keys(PEOPLE)).filter(p=>used.has(p)).map(p=>`<span class="lg">${badge({name:p,color:PEOPLE[p]},18)}${esc(p)}</span>`).join("");
 
   screen.innerHTML=`
    <div class="top">${icon("sun",44)}<div class="day">${FULL[D.days[f]]}</div><div class="date">${label} · ${dd.toLocaleDateString("en-US",{month:"long",day:"numeric"})}</div>
      <div class="ttl">Salzberg<br>Family Plan ${icon("house",38)}</div></div>
    <div class="left">${kidHTML}${dinnerHTML}</div>
    <div class="photo">${PHOTO_OK?`<img src="${PHOTO_SRC}" alt="">`:`<div class="ph-empty">${icon("heart",54)}Family photos<br>show up here</div>`}${fyiHTML}</div>
-   <footer>${icon("car",18)}Who's driving:${lgHTML}<span style="margin-left:auto;display:flex;align-items:center;gap:4px">${icon("star",14)}${esc(D.tab)}</span></footer>`;
+   <footer>${lgHTML?`${icon("car",18)}Who's driving:${lgHTML}`:""}<span style="margin-left:auto;display:flex;align-items:center;gap:4px">${icon("star",14)}${esc(D.tab)}</span></footer>`;
 }
 
 function showError(msg){
