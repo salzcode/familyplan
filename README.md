@@ -13,7 +13,7 @@ The page reads the family Google Sheet, **Salzberg Weekly Family Plan**, every t
 - **Kids:** each kid's rows are the ones under their name in column A. The `Item` text (To school, Home + time, Afterschool) picks the little picture.
 - **Drivers:** the cell **color** is matched to the sheet's **Legend** row. If a cell's color isn't in the legend, the page looks for a name in the text instead (for example, "Navit"). A black cell means "not applicable". The "Needs to be figured out" color, or a `?` in the text, makes the row yellow. `NO SCHOOL` shows white text on black.
 - **Family dinner** and the **Ori/Navit Night Activity** row appear in the green dinner bar.
-- **FYI:** put `FYI` in a cell, with notes to its right and in the rows below it. The section ends at the first blank row. Notes under a day column (Tue, Wed…) only show on that day. All other notes always show. Up to 6 notes appear in a white box over the bottom of the photo.
+- **FYI:** put `FYI` in a cell, with notes to its right and in the rows below it. The section ends at the first blank row. Every note shows every day, whatever column it's in. Up to 6 notes appear in a white box over the bottom of the photo.
 - **Pictures:** the activity picture comes from keywords: soccer, music, guitar, dance, boxing, math, tutoring, drama/rehearsal, CLUE, swim, basketball. The dinner picture also comes from keywords: schnitzel, grill, sushi, salmon/fish, pizza, pasta, tacos, burger, Sukkot, Shabbat/holiday. Anything else gets a star or a plate.
 - **Timing:** the page uses Eastern time. From 7 pm on it shows tomorrow, and on weekends it shows the next school day.
 

@@ -180,7 +180,7 @@ function parseSheet(wb){
       D.rows.push({kid,item,vals});
     }
     // FYI: a cell starting with "FYI" anywhere on the tab; read the cells to its right and the rows below
-    // until a blank row. Text under a day column only shows on that day; everything else always shows.
+    // until a blank row. Every note shows every day.
     D.fyi=[];
     outer: for(let r=0;r<=R.e.r;r++) for(let c=0;c<=R.e.c;c++){
       const t=txt(r,c); if(!/^fyi\b/i.test(t)) continue;
@@ -191,7 +191,7 @@ function parseSheet(wb){
         let any=false;
         for(let cc=c;cc<=R.e.c;cc++){ if(rr===r&&cc===c) continue; if(hidC.has(cc)) continue;
           const v=txt(rr,cc); if(!v||/^[—–-]+$/.test(v)) continue; any=true;
-          const di=days.findIndex(d=>d.c===cc); D.fyi.push({t:v,day:di<0?null:di});
+          D.fyi.push({t:v,day:null}); // FYI notes always show, whatever column they sit in
         }
         if(!any&&rr>r) break;
       }
