@@ -197,6 +197,7 @@ function parseSheet(wb){
       }
       break outer;
     }
+    console.log("FYI found:", JSON.stringify(D.fyi), "| tab:", name);
     return D;
   }
   throw new Error("Couldn't find a tab with a “Child” header row");
