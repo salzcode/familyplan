@@ -10,10 +10,10 @@ The page reads the family Google Sheet, **Salzberg Weekly Family Plan**, every t
 
 - **Tab:** the first tab that has a `Child` header row. Put the current week's tab first, leftmost.
 - **Days:** the day columns (`Monday` … `Friday`). Hidden columns and hidden rows are skipped.
-- **Kids:** each kid's rows are the ones under their name in column A. The `Item` text (To school, Home + time, Afterschool) picks the little picture.
+- **Kids:** each kid's rows are the ones under their name in column A. The `Item` text (To school, Home + time, Afterschool) picks the little picture; the item name itself isn't shown. Blank, `—` and blacked-out cells are hidden.
+- **Times:** a time in a cell (`6 pm`, `5:30-6`, `2:30ish`) moves to the column on the right.
 - **Drivers:** the cell **color** is matched to the sheet's **Legend** row. If a cell's color isn't in the legend, the page looks for a name in the text instead (for example, "Navit"). A black cell means "not applicable". The "Needs to be figured out" color, or a `?` in the text, makes the row yellow. `NO SCHOOL` shows white text on black.
 - **Family dinner** and the **Ori/Navit Night Activity** row appear in the green dinner bar.
-- **FYI:** put `FYI` in a cell, with notes to its right and in the rows below it. The section ends at the first blank row. Every note shows every day, whatever column it's in. Up to 6 notes appear in a white box over the bottom of the photo.
 - **Pictures:** the activity picture comes from keywords: soccer, music, guitar, dance, boxing, math, tutoring, drama/rehearsal, CLUE, swim, basketball. The dinner picture also comes from keywords: schnitzel, grill, sushi, salmon/fish, pizza, pasta, tacos, burger, Sukkot, Shabbat/holiday. Anything else gets a star or a plate.
 - **Timing:** the page uses Eastern time. From 7 pm on it shows tomorrow, and on weekends it shows the next school day.
 
@@ -23,7 +23,11 @@ The Sheet must stay shared as **Anyone with the link → Viewer**.
 
 ## Photos
 
-The right side shows a photo from the shared Google Photos album. The photo changes every hour. `photo.py` picks it, crops it to 262×364 and dithers it to the six display colors. To change the album, edit `ALBUM` in `photo.py`. If the album can't be read, a placeholder shows instead.
+The right side shows a photo from the shared Google Photos album, changing every hour. Only portrait photos that already fit the box are used, so nothing gets awkwardly cropped. To change the album, edit `ALBUM` in `photo.py`.
+
+## Shabbat
+
+From an hour before candle lighting until havdalah, the display switches to a full-screen landscape photo from the album with a "Shabbat Shalom" box: the parasha, candle lighting and havdalah. The times come from Hebcal for Atlanta; change `HEBCAL_GEONAMEID` in `photo.py` for another city, and `SHABBAT_LEAD_MIN` in `index.html` to change the lead time.
 
 ## SenseCraft HMI
 

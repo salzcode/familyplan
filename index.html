@@ -38,7 +38,7 @@ svg{display:block;flex:none}
 .tm small{font:900 9px/1 Nunito,Arial,sans-serif;letter-spacing:.8px;text-transform:uppercase}
 .tx{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
 .lab{font:900 9.5px/1 Nunito,Arial,sans-serif;letter-spacing:.6px;text-transform:uppercase}
-.val{font:800 14.5px/1.08 Nunito,Arial,sans-serif;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.val{font:800 15.5px/1.1 Nunito,Arial,sans-serif;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .val.none{font-weight:700}
 .badge{width:28px;height:28px;border-radius:50%;border:2.5px solid var(--k);display:flex;align-items:center;justify-content:center;font:700 14px Fredoka,Arial,sans-serif;flex:none}
 .row.off{background:var(--k);color:var(--w)}
@@ -70,6 +70,16 @@ svg{display:block;flex:none}
 footer{grid-column:1/3;display:flex;align-items:center;gap:12px;padding:0 4px;font:800 12px Nunito,Arial,sans-serif;white-space:nowrap;overflow:hidden}
 footer .lg{display:flex;align-items:center;gap:4px}
 footer .lg .badge{width:18px;height:18px;font-size:10px;border-width:2px}
+.shabbat{grid-column:1/3;grid-row:1/4;margin:-6px;position:relative;overflow:hidden;background:var(--y)}
+.shabbat img{position:absolute;left:0;top:0;width:800px;height:480px;image-rendering:pixelated}
+.shabbat .nophoto{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:24px;padding-bottom:120px}
+.sh-box{position:absolute;left:16px;bottom:16px;background:var(--w);border:3px solid var(--k);border-radius:18px;padding:12px 18px 14px;display:flex;align-items:center;gap:14px}
+.sh-box h2{font:700 30px/1 Fredoka,Arial,sans-serif;margin-bottom:3px}
+.sh-box .par{font:800 14px Nunito,Arial,sans-serif;margin-bottom:8px}
+.sh-times{display:flex;gap:14px}
+.sh-times div{border-left:3px solid var(--k);padding-left:8px}
+.sh-times small{display:block;font:900 10px Nunito,Arial,sans-serif;letter-spacing:.8px;text-transform:uppercase}
+.sh-times b{font:600 24px/1.05 Fredoka,Arial,sans-serif}
 .msg{grid-column:1/3;grid-row:1/4;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;font:800 20px Nunito,Arial,sans-serif;text-align:center;border:3px solid var(--k);border-radius:16px}
 </style>
 </head>
@@ -281,12 +291,12 @@ function render(D){
         const fl=!off&&((w&&w.flag)||/\?|needs/i.test(v.t));
         const kind=/after|activ/i.test(r.item)?"after":/school/i.test(r.item)?"school":/home|back|pick/i.test(r.item)?"home":"after";
         const ic=off?"sun":none?"none":kind==="after"?pick(ACT,v.t,"star"):kind;
-        return `<div class="row ${off?"off":""} ${fl?"flag":""}">${off?S(ICON.sun,28,W):icon(ic,28)}<div class="tx"><span class="lab">${esc(r.item)}</span><span class="val ${none?"none":""}">${none?"—":esc(st.text)}</span></div>${off||none?"":fl&&!(w&&w.name)?`<span class="badge" style="background:${W}">?</span>`:badge(w)}<div class="tm">${st.time?`<b>${esc(st.time)}</b>${st.ampm?`<small>${st.ampm}</small>`:""}`:""}</div></div>`;
+        return `<div class="row ${off?"off":""} ${fl?"flag":""}">${off?S(ICON.sun,28,W):icon(ic,28)}<div class="tx"><span class="val ${none?"none":""}">${none?"—":esc(st.text||r.item)}</span></div>${off||none?"":fl&&!(w&&w.name)?`<span class="badge" style="background:${W}">?</span>`:badge(w)}<div class="tm">${st.time?`<b>${esc(st.time)}</b>${st.ampm?`<small>${st.ampm}</small>`:""}`:""}</div></div>`;
       }).join("")+`</div></div>`;
   }).join("");
 
   const din=D.dinner[f]||"", night=D.night[f]||"";
-  const dinnerHTML=`<div class="dinner"><span style="background:${W};border-radius:50%;padding:3px;border:2px solid ${K}">${icon(pick(FOOD,din,"plate"),32)}</span><div><small>Family dinner</small><b>${esc(din||"—")}</b></div>${night?`<div class="night">${icon("heart",16).replace("<svg",'<svg style="display:inline-block;vertical-align:-3px"')} ${esc(D.nightLabel||"Night")}<br>${esc(night)}</div>`:""}</div>`;
+  const dinnerHTML=`<div class="dinner"><span style="background:${W};border-radius:50%;padding:3px;border:2px solid ${K}">${icon(pick(FOOD,din,"plate"),32)}</span><div><b>${esc(din||"—")}</b></div>${night?`<div class="night">${icon("heart",16).replace("<svg",'<svg style="display:inline-block;vertical-align:-3px"')} ${esc(night)}</div>`:""}</div>`;
 
   const tiles=D.days.map((n,i)=>{ if(i===f) return "";
     const acts=kids.map(k=>{const r=D.rows.find(r=>r.kid===k&&/after/i.test(r.item)&&!empty(r.vals[i].t)&&!(r.vals[i].bg&&r.vals[i].bg.every(x=>x<40)));
@@ -297,7 +307,7 @@ function render(D){
   }).join("");
 
   const fyi=(D.fyi||[]).filter(x=>x.day===null||x.day===f).map(x=>x.t);
-  const fyiHTML=fyi.length?`<div class="fyi"><h3><i>FYI</i></h3><ul>${fyi.slice(0,6).map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>`:"";
+  const fyiHTML=false&&fyi.length?`<div class="fyi"><h3><i>FYI</i></h3><ul>${fyi.slice(0,6).map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>`:"";
   void tiles; // other-day tiles kept in code in case we want them back
 
   const seen=new Set();
@@ -316,11 +326,33 @@ function render(D){
 function showError(msg){
   screen.innerHTML=`<div class="msg">${icon("clue",56)}<div>Couldn't read the family sheet</div><div style="font-size:14px;font-weight:700">${esc(msg)}</div></div>`;
 }
+/* Shabbat: from an hour before candle lighting until havdalah, show a full-screen photo with the times.
+   shabbat.json and photo_wide.png are made by photo.py in the GitHub Action (Hebcal times). */
+const SHABBAT_LEAD_MIN = 60;
+function shabbatNow(sh){
+  if(!sh||!sh.candles||!sh.havdalah) return false;
+  const t=Date.now(), c=new Date(sh.candles).getTime(), h=new Date(sh.havdalah).getTime();
+  return t>=c-SHABBAT_LEAD_MIN*60000 && t<h;
+}
+function renderShabbat(sh,wideOK){
+  const tm=d=>new Date(d).toLocaleTimeString("en-US",{timeZone:TIME_ZONE,hour:"numeric",minute:"2-digit"}).replace(/\s?([AP])M/,(m,a)=>" "+a.toLowerCase()+"m");
+  screen.innerHTML=`<div class="shabbat">${wideOK?`<img src="photo_wide.png" alt="">`:`<div class="nophoto">${icon("candles",120)}</div>`}
+    <div class="sh-box">${icon("candles",58)}<div><h2>Shabbat Shalom</h2>${sh.parasha?`<div class="par">${esc(sh.parasha)}</div>`:""}
+      <div class="sh-times"><div><small>Candles</small><b>${tm(sh.candles)}</b></div><div><small>Havdalah</small><b>${tm(sh.havdalah)}</b></div></div></div></div></div>`;
+}
+const imgOK=src=>new Promise(res=>{const im=new Image();im.onload=()=>res(im.naturalWidth>0);im.onerror=()=>res(false);im.src=src+"?t="+Date.now()});
 // The display photo is made by the GitHub Action (photo.py) at exactly 262×364, already dithered.
 const PHOTO_SRC="photo.png";
 let PHOTO_OK=false;
 async function load(){
-  PHOTO_OK=await new Promise(res=>{const im=new Image();im.onload=()=>res(im.naturalWidth>0);im.onerror=()=>res(false);im.src=PHOTO_SRC+"?t="+Date.now()});
+  let sh=null; try{const r=await fetch("shabbat.json?t="+Date.now(),{cache:"no-store"}); if(r.ok) sh=await r.json()}catch(e){}
+  const q=new URLSearchParams(location.search);
+  if(q.has("shabbat")||shabbatNow(sh)){
+    renderShabbat(sh||{candles:new Date().toISOString(),havdalah:new Date(Date.now()+864e5).toISOString(),parasha:""},await imgOK("photo_wide.png"));
+    try{await document.fonts.ready}catch(e){}
+    document.body.dataset.ready="1"; return;
+  }
+  PHOTO_OK=await imgOK(PHOTO_SRC);
   try{
     if(!window.XLSX) throw new Error("Spreadsheet reader didn't load");
     const src=new URLSearchParams(location.search).get("xlsx")||`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=xlsx&t=${Date.now()}`;
