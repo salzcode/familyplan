@@ -6,7 +6,7 @@
 <title>Salzberg Weekly Plan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&family=Frank+Ruhl+Libre:wght@700;900&display=block" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 /* Six E Ink Spectra 6 colors only */
@@ -74,7 +74,7 @@ footer .lg .badge{width:18px;height:18px;font-size:10px;border-width:2px}
 .shabbat img{position:absolute;left:0;top:0;width:800px;height:480px;image-rendering:pixelated}
 .shabbat .nophoto{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:24px;padding-bottom:120px}
 .sh-box{position:absolute;left:10px;bottom:10px;background:var(--w);border:3px solid var(--k);border-radius:14px;padding:7px 12px 8px;display:flex;align-items:center;gap:9px}
-.sh-box h2{font:700 21px/1 Fredoka,Arial,sans-serif;margin-bottom:2px}
+.sh-box h2{font:900 25px/1 "Frank Ruhl Libre",serif;direction:rtl;margin-bottom:3px}
 .sh-box .par{font:800 11.5px Nunito,Arial,sans-serif;margin-bottom:5px}
 .sh-times{display:flex;gap:10px}
 .sh-times div{border-left:2.5px solid var(--k);padding-left:6px}
@@ -337,7 +337,7 @@ function shabbatNow(sh){
 function renderShabbat(sh,wideOK){
   const tm=d=>new Date(d).toLocaleTimeString("en-US",{timeZone:TIME_ZONE,hour:"numeric",minute:"2-digit"}).replace(/\s?([AP])M/,(m,a)=>" "+a.toLowerCase()+"m");
   screen.innerHTML=`<div class="shabbat">${wideOK?`<img src="photo_wide.png" alt="">`:`<div class="nophoto">${icon("candles",120)}</div>`}
-    <div class="sh-box">${icon("candles",40)}<div><h2>Shabbat Shalom</h2>${sh.parasha?`<div class="par">${esc(sh.parasha)}</div>`:""}
+    <div class="sh-box">${icon("candles",40)}<div><h2>שבת שלום</h2>${sh.parasha?`<div class="par">${esc(sh.parasha)}</div>`:""}
       <div class="sh-times"><div><small>Candles</small><b>${tm(sh.candles)}</b></div><div><small>Havdalah</small><b>${tm(sh.havdalah)}</b></div></div></div></div></div>`;
 }
 const imgOK=src=>new Promise(res=>{const im=new Image();im.onload=()=>res(im.naturalWidth>0);im.onerror=()=>res(false);im.src=src+"?t="+Date.now()});
