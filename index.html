@@ -73,13 +73,13 @@ footer .lg .badge{width:18px;height:18px;font-size:10px;border-width:2px}
 .shabbat{grid-column:1/3;grid-row:1/4;margin:-6px;position:relative;overflow:hidden;background:var(--y)}
 .shabbat img{position:absolute;left:0;top:0;width:800px;height:480px;image-rendering:pixelated}
 .shabbat .nophoto{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:24px;padding-bottom:120px}
-.sh-box{position:absolute;left:16px;bottom:16px;background:var(--w);border:3px solid var(--k);border-radius:18px;padding:12px 18px 14px;display:flex;align-items:center;gap:14px}
-.sh-box h2{font:700 30px/1 Fredoka,Arial,sans-serif;margin-bottom:3px}
-.sh-box .par{font:800 14px Nunito,Arial,sans-serif;margin-bottom:8px}
-.sh-times{display:flex;gap:14px}
-.sh-times div{border-left:3px solid var(--k);padding-left:8px}
-.sh-times small{display:block;font:900 10px Nunito,Arial,sans-serif;letter-spacing:.8px;text-transform:uppercase}
-.sh-times b{font:600 24px/1.05 Fredoka,Arial,sans-serif}
+.sh-box{position:absolute;left:10px;bottom:10px;background:var(--w);border:3px solid var(--k);border-radius:14px;padding:7px 12px 8px;display:flex;align-items:center;gap:9px}
+.sh-box h2{font:700 21px/1 Fredoka,Arial,sans-serif;margin-bottom:2px}
+.sh-box .par{font:800 11.5px Nunito,Arial,sans-serif;margin-bottom:5px}
+.sh-times{display:flex;gap:10px}
+.sh-times div{border-left:2.5px solid var(--k);padding-left:6px}
+.sh-times small{display:block;font:900 8.5px Nunito,Arial,sans-serif;letter-spacing:.6px;text-transform:uppercase}
+.sh-times b{font:600 17px/1.05 Fredoka,Arial,sans-serif}
 .msg{grid-column:1/3;grid-row:1/4;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;font:800 20px Nunito,Arial,sans-serif;text-align:center;border:3px solid var(--k);border-radius:16px}
 </style>
 </head>
@@ -337,7 +337,7 @@ function shabbatNow(sh){
 function renderShabbat(sh,wideOK){
   const tm=d=>new Date(d).toLocaleTimeString("en-US",{timeZone:TIME_ZONE,hour:"numeric",minute:"2-digit"}).replace(/\s?([AP])M/,(m,a)=>" "+a.toLowerCase()+"m");
   screen.innerHTML=`<div class="shabbat">${wideOK?`<img src="photo_wide.png" alt="">`:`<div class="nophoto">${icon("candles",120)}</div>`}
-    <div class="sh-box">${icon("candles",58)}<div><h2>Shabbat Shalom</h2>${sh.parasha?`<div class="par">${esc(sh.parasha)}</div>`:""}
+    <div class="sh-box">${icon("candles",40)}<div><h2>Shabbat Shalom</h2>${sh.parasha?`<div class="par">${esc(sh.parasha)}</div>`:""}
       <div class="sh-times"><div><small>Candles</small><b>${tm(sh.candles)}</b></div><div><small>Havdalah</small><b>${tm(sh.havdalah)}</b></div></div></div></div></div>`;
 }
 const imgOK=src=>new Promise(res=>{const im=new Image();im.onload=()=>res(im.naturalWidth>0);im.onerror=()=>res(false);im.src=src+"?t="+Date.now()});
